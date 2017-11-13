@@ -3,8 +3,6 @@
 
 Shelly::Shelly()
 {
-
-
 }
 
 Shelly::Shelly(const Shelly& orig)
@@ -27,7 +25,7 @@ void Shelly::prepare()
 
     //Check Input
     this->input = Interface();
-
+    this->inputMem.push_back(input);
     this->size = std::count(this->input.begin(), this->input.end(), ' ') + 3; //musste +3 why
     this->length = this->input.size();
 

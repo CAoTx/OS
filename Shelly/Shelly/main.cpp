@@ -4,7 +4,12 @@
 //    ext, logout, enter, exec_stop, exec_go
 //};
 
-
+void handle_SIGSEGV(int signum){
+    std::cout<<"SEG_FAULT:"<<signum<<std::endl;
+}
+void handle_cKey(int signum){
+    
+}
 
 intyp inTyp(char** arr);
 bool shelly();
@@ -12,21 +17,22 @@ bool shelly();
 int main()
 {
 
-//    Shelly shell;
-//
-//    while (shell.execute());
+    Shelly shell;
 
-       // signal(SIGSEGV, handle_SIGSEGV);
+    while (shell.execute());
+
+        signal(SIGSEGV, handle_SIGSEGV);
+        signal(SIGINT, handle_cKey);
     
-        try {
-            while (shelly());
-    
-            //        for(int i = 0; i<3;i++)   //funktioniert nicht ??
-            //            shelly;
-        }    catch (...) {
-            std::cerr << "Oops. That Failed, BYE /n" << std::endl;
-            return 0;
-        }
+//        try {
+//            while (shelly());
+//    
+//            //        for(int i = 0; i<3;i++)   //funktioniert nicht ??
+//            //            shelly;
+//        }    catch (...) {
+//            std::cerr << "Oops. That Failed, BYE /n" << std::endl;
+//            return 0;
+//        }
     return 0;
 }
 

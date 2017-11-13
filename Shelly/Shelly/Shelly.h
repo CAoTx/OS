@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
+#include <vector>
 
 #include <unistd.h>
 #include <cstdio>
@@ -35,6 +36,7 @@ private:
     int length;
     std::string input;
     intyp iTyp;
+    std::vector<std::string> inputMem;
 };
 
 #endif /* SHELLY_H */
