@@ -3,6 +3,8 @@
 
 Shelly::Shelly()
 {
+    //Search for other ProcessHandler of deeper Layers make them to yours
+    //maybe has to implement a synch function to keep all PHandlers Synchron 
 }
 
 Shelly::Shelly(const Shelly& orig)
@@ -52,7 +54,7 @@ bool Shelly::execute()
 {
     prepare();
 
-    int pid = fork();
+    int pid = pHandler.doFork();
     int status = 0;
 
     //CHILD
@@ -95,7 +97,6 @@ bool Shelly::execute()
             std::cout << "\nHauste" << std::endl;
             return false;
         }
-
     }
     return true;
 }

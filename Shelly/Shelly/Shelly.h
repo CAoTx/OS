@@ -1,16 +1,10 @@
-
 #ifndef SHELLY_H
 #define SHELLY_H
 
 #include <iostream>
 #include <sstream>
-#include <string>
+#include "ProcessHandler.h"
 #include <algorithm>
-#include <vector>
-
-#include <unistd.h>
-#include <cstdio>
-#include <sys/wait.h>
 
 enum intyp
 {
@@ -28,8 +22,10 @@ public:
     intyp inputType();
     bool execute();
     void clean();
-
+    ProcessHandler* getPHandler();
+    
     virtual ~Shelly();
+    
 private:
     char** xcute;
     int size;
@@ -37,6 +33,8 @@ private:
     std::string input;
     intyp iTyp;
     std::vector<std::string> inputMem;
+    ProcessHandler pHandler;
+    
 };
 
 #endif /* SHELLY_H */
