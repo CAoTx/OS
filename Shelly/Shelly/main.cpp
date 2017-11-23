@@ -11,7 +11,12 @@ void handle_SIGSEGV(int signum)
     std::cout << "SEG_FAULT:" << signum << std::endl;
 }
 
-void handle_cKey(int signum)
+void handle_keyC(int signum)
+{
+    std::cout << "test" << std::endl;
+}
+
+void handle_keyZ(int signum)
 {
 
 }
@@ -22,7 +27,9 @@ bool shelly();
 int main()
 {
     signal(SIGSEGV, handle_SIGSEGV);
-    signal(SIGINT, handle_cKey);
+    signal(SIGINT, handle_keyC);
+    signal(SIGSTOP,handle_keyZ);
+    
     Shelly shell;
     try
     {

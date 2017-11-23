@@ -1,7 +1,7 @@
 #ifndef SHELLY_H
 #define SHELLY_H
 
-#include <iostream>
+
 #include <sstream>
 #include "ProcessHandler.h"
 #include <algorithm>
@@ -33,7 +33,7 @@ private:
     std::string input;
     intyp iTyp;
     std::vector<std::string> inputMem;
-    ProcessHandler pHandler;
+    ProcessHandler* pHandler;
     
 };
 

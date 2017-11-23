@@ -3,6 +3,7 @@
 
 Shelly::Shelly()
 {
+    pHandler = new ProcessHandler();
     //Search for other ProcessHandler of deeper Layers make them to yours
     //maybe has to implement a synch function to keep all PHandlers Synchron 
 }
@@ -27,7 +28,7 @@ void Shelly::prepare()
 
     //Check Input
     this->input = Interface();
-    this->inputMem.push_back(input);
+    this->inputMem.push_back(input); //Safe up 
     this->size = std::count(this->input.begin(), this->input.end(), ' ') + 3; //musste +3 why
     this->length = this->input.size();
 
@@ -54,7 +55,8 @@ bool Shelly::execute()
 {
     prepare();
 
-    int pid = pHandler.doFork();
+    int pid = pHandler->doFork();
+
     int status = 0;
 
     //CHILD
@@ -77,25 +79,43 @@ bool Shelly::execute()
     }
     else if (iTyp == intyp::exec_go && pid != 0)
     {
+        pHandler->getProcess(pid)->changeStatus(Process::ProcessStatus::normalBack);
         //waitpid(pid, &status, WNOHANG);
     }
     else if (iTyp == intyp::ext && pid != 0)
     {
-        std::cout << "\nHauste" << std::endl;
-        return false;
-    }
-    else if (iTyp == intyp::logout && pid != 0)
-    {
-        std::string in;
-
-        std::cout << "\n\n"; //4 debug
-        std::cout << "Wirklich Beenden? Y or n\n>>";
-        std::cin>>in;
-
-        if (in == "Y" || in == "y" || in == "j" || in == "J")
+        if (pHandler->closeAble())
         {
             std::cout << "\nHauste" << std::endl;
             return false;
+        }
+        else
+        {
+            std::cout << "There are still working Jobs that need to be closed" << std::endl;
+        }
+
+    }
+    else if (iTyp == intyp::logout && pid != 0)
+    {
+
+        if (pHandler->closeAble())
+        {
+            std::string in;
+
+            std::cout << "\n\n"; //4 debug
+            std::cout << "Wirklich Beenden? Y or n\n>>";
+            std::cin>>in;
+
+            if (in == "Y" || in == "y" || in == "j" || in == "J")
+            {
+                std::cin.ignore(187, '\n');
+                std::cout << "\nHauste" << std::endl;
+                return false;
+            }
+        }
+        else
+        {
+            std::cout << "There are still working Jobs that need to be closed" << std::endl;
         }
     }
     return true;

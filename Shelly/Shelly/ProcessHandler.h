@@ -5,21 +5,26 @@
 #include <cstdio> //fork?
 #include <sys/wait.h> //waitpid
 
-#include <vector>
-#include <string>
+#include "Process.h"
 
 class ProcessHandler
 {
 public:
-    
     ProcessHandler();
+
     pid_t doFork();
     int timesForked();
+    Process* getProcess(pid_t pid);
+    bool closeAble();
+//    Process* getProcess(int index);
+
     //ProcessHandler(const ProcessHandler& orig);
     virtual ~ProcessHandler();
+
 private:
+    std::vector<Process*> processes; 
+    std::map<pid_t, Process*> m_processes;
     
-    std::vector<pid_t> pidS;
 
 };
 

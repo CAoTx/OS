@@ -4,6 +4,8 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>Process.h</itemPath>
+      <itemPath>ProcessHandler.h</itemPath>
       <itemPath>Shelly.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -13,6 +15,8 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>Process.cpp</itemPath>
+      <itemPath>ProcessHandler.cpp</itemPath>
       <itemPath>Shelly.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
@@ -32,7 +36,7 @@
   <confs>
     <conf name="Debug" type="1">
       <toolsSet>
-        <compilerSet>GNU|GNU</compilerSet>
+        <compilerSet>CLang|CLang</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
@@ -42,6 +46,14 @@
           <commandlineTool>clang++</commandlineTool>
         </ccTool>
       </compileType>
+      <item path="Process.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Process.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ProcessHandler.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ProcessHandler.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="Shelly.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Shelly.h" ex="false" tool="3" flavor2="0">
@@ -70,6 +82,14 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="Process.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Process.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ProcessHandler.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ProcessHandler.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="Shelly.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Shelly.h" ex="false" tool="3" flavor2="0">
