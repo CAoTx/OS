@@ -53,16 +53,16 @@ void Shelly::prepare()
 
 bool Shelly::execute()
 {
+    int status = 0;
     prepare();
 
     int pid = pHandler->doFork();
 
-    int status = 0;
 
     //CHILD
-    if ((iTyp == intyp::exec_stop && pid == 0) || (iTyp == intyp::exec_go && pid == 0))
+    if ((iTyp == intyp::exec_fg && pid == 0) || (iTyp == intyp::exec_bg && pid == 0))
     {
-        if (iTyp == intyp::exec_go)
+        if (iTyp == intyp::exec_bg)
         {
             xcute[size - 3] = nullptr;
         }
@@ -72,16 +72,46 @@ bool Shelly::execute()
         execvp(xcute[0], xcute);
         //return false;
         exit(0);
-    } //PARENT
-    else if (iTyp == intyp::exec_stop && pid != 0)
-    {
-        waitpid(pid, &status, !(WNOHANG));
     }
-    else if (iTyp == intyp::exec_go && pid != 0)
+
+        //PARENT
+    else if (iTyp == intyp::exec_fg && pid != 0)
     {
-        pHandler->getProcess(pid)->changeStatus(Process::ProcessStatus::normalBack);
-        //waitpid(pid, &status, WNOHANG);
+        waitpid(pid, &status, WUNTRACED);
     }
+    else if (iTyp == intyp::exec_bg && pid != 0)
+    {
+        pHandler->getProcess(pid)->changeStatus(Process::ProcessStatus::workBack);
+        waitpid(pid, &status, WUNTRACED | WNOHANG);
+    }
+    else if (iTyp == intyp::hc_fg && pid != 0)
+    {
+        Process* process = pHandler->getLastHaltedProcess();
+        pid_t pid = process->getPid();
+        Process::ProcessStatus status = process->getStatus();
+        if (status == Process::ProcessStatus::halted || status == Process::ProcessStatus::stopped)
+        {
+            kill(pid, SIGCONT);
+            process->changeStatus(Process::ProcessStatus::workFront);
+        }
+        waitpid(pid, 0, WUNTRACED);
+        return true;
+    }
+
+    else if (iTyp == intyp::hc_bg && pid != 0)
+    {
+        Process* process = pHandler->getLastHaltedProcess();
+        pid_t pid = process->getPid();
+        Process::ProcessStatus status = process->getStatus();
+        if (status == Process::ProcessStatus::halted || status == Process::ProcessStatus::stopped)
+        {
+            kill(pid, SIGCONT);
+            process->changeStatus(Process::ProcessStatus::workFront);
+        }
+        waitpid(pid, 0, WUNTRACED | WNOHANG);
+        return true;
+    }
+
     else if (iTyp == intyp::ext && pid != 0)
     {
         if (pHandler->closeAble())
@@ -121,6 +151,11 @@ bool Shelly::execute()
     return true;
 }
 
+ProcessHandler* Shelly::getPHandler()
+{
+    return this->pHandler;
+}
+
 intyp Shelly::inputType()
 {
     std::string str = this->xcute[0];
@@ -131,13 +166,17 @@ intyp Shelly::inputType()
         return intyp::ext;
     else if (str == "logout")
         return intyp::logout;
+    else if (str == "bg")
+        return intyp::hc_bg;
+    else if (str == "fg")
+        return intyp::hc_fg;
 
     for (int i = 0; this->xcute[i] != nullptr; i++)
     {
         if (*(this->xcute[i]) == '&')
-            return intyp::exec_go;
+            return intyp::exec_bg;
     }
-    return intyp::exec_stop;
+    return intyp::exec_fg;
 }
 
 void Shelly::clean()

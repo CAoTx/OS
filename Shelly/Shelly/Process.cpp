@@ -9,7 +9,7 @@ Process::Process(pid_t myID)
         status = ProcessStatus::sick;
         throw "Failure in Process(): StartTime = ";
     }
-    status = ProcessStatus::normalFront;
+    status = ProcessStatus::workFront;
     pid = myID;
 
     Event eventStart{("Start of this Process, " + getStringStatus(status)), time(nullptr)};
@@ -26,19 +26,19 @@ void Process::addEvent(std::string text)
 
 std::string Process::getStringStatus(ProcessStatus stat)
 {
-    if (stat == ProcessStatus::normalFront)
+    if (stat == ProcessStatus::workFront)
         return "normal";
     else if (stat == ProcessStatus::halted)
         return "halted";
-    else if (stat == ProcessStatus::stopp)
+    else if (stat == ProcessStatus::stopped)
         return "stop";
     else if (stat == ProcessStatus::endet)
         return "endet";
     else if (stat == ProcessStatus::sick)
         return "sick";
-    else if (stat == ProcessStatus::normalFront)
+    else if (stat == ProcessStatus::workFront)
         return "zombi";
-    else if (stat == ProcessStatus::normalBack)
+    else if (stat == ProcessStatus::workBack)
         return "normalBack";
 }
 
@@ -53,6 +53,11 @@ Process::ProcessStatus Process::changeStatus(ProcessStatus newStat)
 Process::ProcessStatus Process::getStatus()
 {
     return this->status;
+}
+
+pid_t Process::getPid()
+{
+    return this->pid;
 }
 
 

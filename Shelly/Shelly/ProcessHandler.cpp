@@ -7,6 +7,7 @@ ProcessHandler::ProcessHandler()
 pid_t ProcessHandler::doFork()
 {
     pid_t pid = fork();
+    setpgid(pid, pid);  //separate Parent & Child Process into separat ProcessGroups
     //If Parent
     if (pid != 0)
     {
@@ -14,7 +15,6 @@ pid_t ProcessHandler::doFork()
         m_processes.insert(std::pair<pid_t, Process*>(pid, newy));
     }
     return pid;
-
 }
 
 int ProcessHandler::timesForked()
@@ -27,24 +27,73 @@ Process* ProcessHandler::getProcess(pid_t pid)
     return m_processes[pid];
 }
 
+Process::ProcessStatus ProcessHandler::changeProcessStatus(pid_t pd, Process::ProcessStatus newStatus)
+{
+    for (int i = 0; i < m_processes.size(); i++)
+    {
+        if (m_processes.at(i)->getPid() == pd)
+            m_processes.at(i)->changeStatus(newStatus);
+    }
+}
+
 bool ProcessHandler::closeAble()
 {
-
-
-    //    for (int i = 0; i < m_processes.size(); i++)
-    //    {
-    //        if (m_processes[i]->getStatus() != Process::ProcessStatus::endet || m_processes[i]->getStatus() != Process::ProcessStatus::zombi)
-    //            return false;
-    //    }
     for (auto it : m_processes)
     {
         if (it.second->getStatus() != Process::ProcessStatus::endet || it.second->getStatus() != Process::ProcessStatus::zombi)
             return false;
     }
-
-
     return true;
+}
 
+Process* ProcessHandler::getLastFrontProcess()
+{
+    for (int i = m_processes.size(); i > 0; i++)
+    {
+        if (m_processes.at(i)->getStatus() == Process::ProcessStatus::workFront)
+            return m_processes.at(i);
+    }
+    return nullptr;
+}
+
+Process* ProcessHandler::getLastBackProcss()
+{
+    for (int i = m_processes.size(); i > 0; i++)
+    {
+        if (m_processes.at(i)->getStatus() == Process::ProcessStatus::workBack)
+            return m_processes.at(i);
+    }
+    return nullptr;
+}
+
+Process* ProcessHandler::getLastHaltedProcess()
+{
+    for (int i = m_processes.size(); i > 0; i++)
+    {
+        if (m_processes.at(i)->getStatus() == Process::ProcessStatus::halted)
+            return m_processes.at(i);
+    }
+    return nullptr;
+}
+
+Process* ProcessHandler::getLastStoppedProcess()
+{
+    for (int i = m_processes.size(); i > 0; i++)
+    {
+        if (m_processes.at(i)->getStatus() == Process::ProcessStatus::stopped)
+            return m_processes.at(i);
+    }
+    return nullptr;
+}
+
+Process* ProcessHandler::getLastZombiProcess()
+{
+    for (int i = m_processes.size(); i > 0; i++)
+    {
+        if (m_processes.at(i)->getStatus() == Process::ProcessStatus::zombi)
+            return m_processes.at(i);
+    }
+    return nullptr;
 }
 
 ProcessHandler::~ProcessHandler()

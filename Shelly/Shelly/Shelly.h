@@ -8,7 +8,7 @@
 
 enum intyp
 {
-    ext, logout, enter, exec_stop, exec_go
+    ext, logout, enter, exec_fg, exec_bg, hc_fg, hc_bg
 };
 
 class Shelly

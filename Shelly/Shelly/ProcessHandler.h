@@ -15,16 +15,22 @@ public:
     pid_t doFork();
     int timesForked();
     Process* getProcess(pid_t pid);
+    Process::ProcessStatus changeProcessStatus(pid_t pd, Process::ProcessStatus newStatus);
     bool closeAble();
-//    Process* getProcess(int index);
+    Process* getLastFrontProcess();
+    Process* getLastBackProcss();
+    Process* getLastHaltedProcess();
+    Process* getLastStoppedProcess();
+    Process* getLastZombiProcess();
+    //    Process* getProcess(int index);
 
     //ProcessHandler(const ProcessHandler& orig);
     virtual ~ProcessHandler();
 
 private:
-    std::vector<Process*> processes; 
+    std::vector<Process*> processes;
     std::map<pid_t, Process*> m_processes;
-    
+
 
 };
 
