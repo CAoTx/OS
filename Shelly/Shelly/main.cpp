@@ -26,6 +26,7 @@ void handle_keyC(int signum) {
         pid_t pid = process->getPid();
         kill(pid, SIGINT);
         std::cout << "Stopped Process - pid:" << pid;
+        
     } else {
         std::string in;
 
@@ -55,7 +56,6 @@ void handle_SIGCHLD(int signum) {
     l_pid = waitpid(-1, &status, WNOHANG);
     if (l_pid == -1);
     else {
-        std::cout<<"SIGCHLT SEB"<<std::endl;
         Process* process = shelly.getPHandler()->getProcess(l_pid);
         process->changeStatus(Process::ProcessStatus::endet);               //Hier crash
         std::cout << "\nProcess " << l_pid << " terminated" << std::endl;

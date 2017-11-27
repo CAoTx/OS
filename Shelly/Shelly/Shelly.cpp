@@ -49,15 +49,15 @@ bool Shelly::execute() {
     int status = 0;
     pid_t pid;
     prepare();
-    
-    if (iTyp != intyp::ext && iTyp != intyp::logout ){
-    std::string instruction = xcute[0];
-    //pid = pHandler->doFork(instruction);
-    pid = fork();
-    if (pid != 0){
-    Process* newy = new Process(pid, instruction);
-    pHandler->addProcess(newy);
-    }
+
+    if (iTyp != intyp::ext && iTyp != intyp::logout) {
+        std::string instruction = xcute[0];
+        pid = pHandler->doFork(instruction);
+        // pid = fork();
+        //    if (pid > 0){
+        //    Process* newy = new Process(pid, instruction);
+        //    pHandler->addProcess(newy);
+        //    }
     }
 
     //CHILD
@@ -69,22 +69,20 @@ bool Shelly::execute() {
         std::cout << "2." << xcute[1] << std::endl;
         std::cout << std::endl;
         execvp(xcute[0], xcute);
-        return false;                 ///HAVE TO TEST
-       // exit(0);
+        return false; ///HAVE TO TEST
+        // exit(0);
     }
-    
-    //PARENT
+        //PARENT
     else if (iTyp == intyp::exec_foreg && pid != 0) {
-        waitpid(pid, &status, WNOHANG);
-        pHandler->getLastFrontProcess()->changeStatus(Process::ProcessStatus::endet);
+        if (waitpid(-1, 0, WNOHANG) > 0) {
+            pHandler->getLastFrontProcess()->changeStatus(Process::ProcessStatus::endet);
+        }
     }
-
     else if (iTyp == intyp::exec_backg && pid != 0) {
         pHandler->getProcess(pid)->changeStatus(Process::ProcessStatus::workBack);
         waitpid(pid, &status, WUNTRACED | WNOHANG);
-        
-    }
 
+    }
     else if (iTyp == intyp::hc_fg && pid != 0) {
         Process * process = nullptr;
         if (xcute[1] != nullptr && *xcute[1]>-20 && *xcute[1] < 4500) {
@@ -101,7 +99,6 @@ bool Shelly::execute() {
         waitpid(pid, 0, WUNTRACED);
         return true;
     }
-
     else if (iTyp == intyp::hc_bg && pid != 0) {
         Process * process = nullptr;
         if (xcute[1] != nullptr && *xcute[1]>-20 && *xcute[1] < 4500) {
@@ -118,7 +115,6 @@ bool Shelly::execute() {
         waitpid(pid, 0, WUNTRACED | WNOHANG);
         return true;
     }
-
     else if (iTyp == intyp::ext && pid != 0) {
         if (pHandler->closeAble()) {
             std::cout << "\nHauste" << std::endl;
@@ -128,7 +124,6 @@ bool Shelly::execute() {
         }
 
     }
-
     else if (iTyp == intyp::logout && pid != 0) {
 
         if (pHandler->closeAble()) {
