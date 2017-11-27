@@ -52,7 +52,10 @@ bool Shelly::execute() {
     
     if (iTyp != intyp::ext && iTyp != intyp::logout ){
     std::string instruction = xcute[0];
-    pid = pHandler->doFork(instruction);
+    //pid = pHandler->doFork(instruction);
+    pid = fork();
+    Process* newy = new Process(pid, instruction);
+    pHandler->addProcess(newy);
     }
 
     //CHILD

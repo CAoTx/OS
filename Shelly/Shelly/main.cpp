@@ -56,7 +56,7 @@ void handle_SIGCHLD(int signum) {
     if (l_pid == -1);
     else {
         Process* process = shelly.getPHandler()->getProcess(l_pid);
-        process->changeStatus(Process::ProcessStatus::endet);
+        process->changeStatus(Process::ProcessStatus::endet);               //Hier crash
         std::cout << "\nProcess " << l_pid << " terminated" << std::endl;
         return;
     }

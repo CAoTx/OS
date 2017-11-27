@@ -14,6 +14,7 @@ public:
 
     pid_t doFork(std::string instruction);
     int timesForked();
+    void addProcess(Process* newProcess);
     Process* getProcess(pid_t pid);
     Process::ProcessStatus changeProcessStatus(pid_t pd, Process::ProcessStatus newStatus);
     bool closeAble();

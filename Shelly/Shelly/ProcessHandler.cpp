@@ -6,7 +6,8 @@ ProcessHandler::ProcessHandler() {
 pid_t ProcessHandler::doFork(std::string instruction) {
 
     pid_t pid = fork();
-    setpgid(pid, pid); //separate Parent & Child Process into separat ProcessGroups
+    setpgid(pid, pid); //separate Parent & Child Process into separat ProcessGroups   
+    //Ab Hier gehts zum SIGCHLT
     if (pid < 0) {
         std::cerr << "Failed of Fork" << std::endl;
         exit(0);
@@ -80,6 +81,10 @@ Process* ProcessHandler::getLastZombiProcess() {
             return m_processes.at(i);
     }
     return nullptr;
+}
+
+void ProcessHandler::addProcess(Process* newProcess) {
+    this->m_processes.insert(std::pair<pid_t, Process*>(newProcess->getPid(), newProcess));
 }
 
 ProcessHandler::~ProcessHandler() {
