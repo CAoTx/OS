@@ -12,7 +12,7 @@ Process::Process(pid_t myID, std::string instruction)
     status = ProcessStatus::workFront;
     pid = myID;
 
-    Event eventStart{("Start of this Process, " + getStringStatus(status)) +" "+instruction, time(nullptr)};
+    Event eventStart{("Start of this Process, " + getStringStatus(status)) +","+instruction, time(nullptr)};
     tLog.insert(std::pair<std::string, Event>("start", eventStart));
 }
 

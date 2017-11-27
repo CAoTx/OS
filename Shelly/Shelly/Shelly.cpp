@@ -64,17 +64,20 @@ bool Shelly::execute() {
         std::cout << "2." << xcute[1] << std::endl;
         std::cout << std::endl;
         execvp(xcute[0], xcute);
-        //return false;
-        exit(0);
-    }//PARENT
+        return false;                 ///HAVE TO TEST
+       // exit(0);
+    }
+    
+    //PARENT
     else if (iTyp == intyp::exec_foreg && pid != 0) {
-        waitpid(pid, &status, WUNTRACED);
+        waitpid(pid, &status, WNOHANG);
         pHandler->getLastFrontProcess()->changeStatus(Process::ProcessStatus::endet);
     }
 
     else if (iTyp == intyp::exec_backg && pid != 0) {
         pHandler->getProcess(pid)->changeStatus(Process::ProcessStatus::workBack);
         waitpid(pid, &status, WUNTRACED | WNOHANG);
+        
     }
 
     else if (iTyp == intyp::hc_fg && pid != 0) {
