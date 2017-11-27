@@ -1,19 +1,16 @@
 
 #include "Shelly.h"
 
-Shelly::Shelly()
-{
+Shelly::Shelly() {
     pHandler = new ProcessHandler();
     //Search for other ProcessHandler of deeper Layers make them to yours
     //maybe has to implement a synch function to keep all PHandlers Synchron 
 }
 
-Shelly::Shelly(const Shelly& orig)
-{
+Shelly::Shelly(const Shelly& orig) {
 }
 
-std::string Shelly::Interface()
-{
+std::string Shelly::Interface() {
     std::string input;
 
     std::cout << ">>";
@@ -23,8 +20,7 @@ std::string Shelly::Interface()
     return input;
 }
 
-void Shelly::prepare()
-{
+void Shelly::prepare() {
 
     //Check Input
     this->input = Interface();
@@ -36,13 +32,11 @@ void Shelly::prepare()
     this->xcute = new char*[this->size];
 
     //Init array
-    for (int i = 0; i < this->size; i++)
-    {
+    for (int i = 0; i < this->size; i++) {
         this->xcute[i] = new char[this->length];
     }
     //fill array
-    for (int i = 0; !(ss.eof()); i++)
-    {
+    for (int i = 0; !(ss.eof()); i++) {
         ss >> this->xcute[i];
         if (ss.eof())
             this->xcute[i + 1] = nullptr;
@@ -51,19 +45,19 @@ void Shelly::prepare()
 
 }
 
-bool Shelly::execute()
-{
+bool Shelly::execute() {
     int status = 0;
+    int pid;
     prepare();
-
-    int pid = pHandler->doFork();
-
+    
+    if (iTyp != intyp::ext && iTyp != intyp::logout ){
+    std::string instruction = xcute[0];
+    pid = pHandler->doFork(instruction);
+    }
 
     //CHILD
-    if ((iTyp == intyp::exec_fg && pid == 0) || (iTyp == intyp::exec_bg && pid == 0))
-    {
-        if (iTyp == intyp::exec_bg)
-        {
+    if ((iTyp == intyp::exec_foreg && pid == 0) || (iTyp == intyp::exec_backg && pid == 0)) {
+        if (iTyp == intyp::exec_backg) {
             xcute[size - 3] = nullptr;
         }
         std::cout << "\n1." << xcute[0] << std::endl;
@@ -72,25 +66,27 @@ bool Shelly::execute()
         execvp(xcute[0], xcute);
         //return false;
         exit(0);
+    }//PARENT
+    else if (iTyp == intyp::exec_foreg && pid != 0) {
+        waitpid(pid, &status, WUNTRACED);
+        pHandler->getLastFrontProcess()->changeStatus(Process::ProcessStatus::endet);
     }
 
-        //PARENT
-    else if (iTyp == intyp::exec_fg && pid != 0)
-    {
-        waitpid(pid, &status, WUNTRACED);
-    }
-    else if (iTyp == intyp::exec_bg && pid != 0)
-    {
+    else if (iTyp == intyp::exec_backg && pid != 0) {
         pHandler->getProcess(pid)->changeStatus(Process::ProcessStatus::workBack);
         waitpid(pid, &status, WUNTRACED | WNOHANG);
     }
-    else if (iTyp == intyp::hc_fg && pid != 0)
-    {
-        Process* process = pHandler->getLastHaltedProcess();
+
+    else if (iTyp == intyp::hc_fg && pid != 0) {
+        Process * process = nullptr;
+        if (xcute[1] != nullptr && *xcute[1]>-20 && *xcute[1] < 4500) {
+            process = pHandler->getProcess(*xcute[1]);
+        } else {
+            process = pHandler->getLastHaltedProcess();
+        }
         pid_t pid = process->getPid();
         Process::ProcessStatus status = process->getStatus();
-        if (status == Process::ProcessStatus::halted || status == Process::ProcessStatus::stopped)
-        {
+        if (status == Process::ProcessStatus::halted || status == Process::ProcessStatus::stopped) {
             kill(pid, SIGCONT);
             process->changeStatus(Process::ProcessStatus::workFront);
         }
@@ -98,13 +94,16 @@ bool Shelly::execute()
         return true;
     }
 
-    else if (iTyp == intyp::hc_bg && pid != 0)
-    {
-        Process* process = pHandler->getLastHaltedProcess();
+    else if (iTyp == intyp::hc_bg && pid != 0) {
+        Process * process = nullptr;
+        if (xcute[1] != nullptr && *xcute[1]>-20 && *xcute[1] < 4500) {
+            process = pHandler->getProcess(*xcute[1]);
+        } else {
+            process = pHandler->getLastHaltedProcess();
+        }
         pid_t pid = process->getPid();
         Process::ProcessStatus status = process->getStatus();
-        if (status == Process::ProcessStatus::halted || status == Process::ProcessStatus::stopped)
-        {
+        if (status == Process::ProcessStatus::halted || status == Process::ProcessStatus::stopped) {
             kill(pid, SIGCONT);
             process->changeStatus(Process::ProcessStatus::workFront);
         }
@@ -112,52 +111,42 @@ bool Shelly::execute()
         return true;
     }
 
-    else if (iTyp == intyp::ext && pid != 0)
-    {
-        if (pHandler->closeAble())
-        {
+    else if (iTyp == intyp::ext && pid != 0) {
+        if (pHandler->closeAble()) {
             std::cout << "\nHauste" << std::endl;
             return false;
-        }
-        else
-        {
+        } else {
             std::cout << "There are still working Jobs that need to be closed" << std::endl;
         }
 
     }
-    else if (iTyp == intyp::logout && pid != 0)
-    {
 
-        if (pHandler->closeAble())
-        {
+    else if (iTyp == intyp::logout && pid != 0) {
+
+        if (pHandler->closeAble()) {
             std::string in;
 
             std::cout << "\n\n"; //4 debug
             std::cout << "Wirklich Beenden? Y or n\n>>";
             std::cin>>in;
 
-            if (in == "Y" || in == "y" || in == "j" || in == "J")
-            {
+            if (in == "Y" || in == "y" || in == "j" || in == "J") {
                 std::cin.ignore(187, '\n');
                 std::cout << "\nHauste" << std::endl;
                 return false;
             }
-        }
-        else
-        {
+        } else {
             std::cout << "There are still working Jobs that need to be closed" << std::endl;
         }
     }
     return true;
 }
 
-ProcessHandler* Shelly::getPHandler()
-{
+ProcessHandler* Shelly::getPHandler() {
     return this->pHandler;
 }
 
-intyp Shelly::inputType()
-{
+intyp Shelly::inputType() {
     std::string str = this->xcute[0];
 
     if (*(this->xcute[0]) == ' ')
@@ -171,26 +160,21 @@ intyp Shelly::inputType()
     else if (str == "fg")
         return intyp::hc_fg;
 
-    for (int i = 0; this->xcute[i] != nullptr; i++)
-    {
+    for (int i = 0; this->xcute[i] != nullptr; i++) {
         if (*(this->xcute[i]) == '&')
-            return intyp::exec_bg;
+            return intyp::exec_backg;
     }
-    return intyp::exec_fg;
+    return intyp::exec_foreg;
 }
 
-void Shelly::clean()
-{
-    for (int i = 0; i < size; i++)
-    {
+void Shelly::clean() {
+    for (int i = 0; i < size; i++) {
         delete xcute [i];
     }
 }
 
-Shelly::~Shelly()
-{
-    for (int i = 0; i < size; i++)
-    {
+Shelly::~Shelly() {
+    for (int i = 0; i < size; i++) {
         delete xcute [i];
     }
     delete xcute;

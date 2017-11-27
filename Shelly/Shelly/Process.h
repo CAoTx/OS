@@ -22,7 +22,7 @@ public:
     {
         sick = -2, zombi = -1, workFront = 1, halted = 2, stopped = 3, endet = 4, workBack = 11
     };
-    Process(pid_t myId);
+    Process(pid_t myId, std::string instruction);
     void addEvent(std::string text);
     std::string getStringStatus(ProcessStatus stat);
     ProcessStatus getStatus();

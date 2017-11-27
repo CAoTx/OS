@@ -4,14 +4,14 @@ ProcessHandler::ProcessHandler()
 {
 }
 
-pid_t ProcessHandler::doFork()
+pid_t ProcessHandler::doFork(std::string instruction)
 {
     pid_t pid = fork();
     setpgid(pid, pid);  //separate Parent & Child Process into separat ProcessGroups
     //If Parent
     if (pid != 0)
     {
-        Process* newy = new Process(pid);
+        Process* newy = new Process(pid, instruction);
         m_processes.insert(std::pair<pid_t, Process*>(pid, newy));
     }
     return pid;
@@ -42,7 +42,7 @@ bool ProcessHandler::closeAble()
     {
         if (it.second->getStatus() != Process::ProcessStatus::endet || it.second->getStatus() != Process::ProcessStatus::zombi)
             return false;
-    }
+    };
     return true;
 }
 
@@ -56,7 +56,7 @@ Process* ProcessHandler::getLastFrontProcess()
     return nullptr;
 }
 
-Process* ProcessHandler::getLastBackProcss()
+Process* ProcessHandler::getLastBackProcess()
 {
     for (int i = m_processes.size(); i > 0; i++)
     {

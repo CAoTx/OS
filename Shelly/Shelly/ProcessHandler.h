@@ -12,13 +12,13 @@ class ProcessHandler
 public:
     ProcessHandler();
 
-    pid_t doFork();
+    pid_t doFork(std::string instruction);
     int timesForked();
     Process* getProcess(pid_t pid);
     Process::ProcessStatus changeProcessStatus(pid_t pd, Process::ProcessStatus newStatus);
     bool closeAble();
     Process* getLastFrontProcess();
-    Process* getLastBackProcss();
+    Process* getLastBackProcess();
     Process* getLastHaltedProcess();
     Process* getLastStoppedProcess();
     Process* getLastZombiProcess();
@@ -28,7 +28,6 @@ public:
     virtual ~ProcessHandler();
 
 private:
-    std::vector<Process*> processes;
     std::map<pid_t, Process*> m_processes;
 
 
