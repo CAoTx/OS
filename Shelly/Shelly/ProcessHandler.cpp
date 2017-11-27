@@ -4,13 +4,14 @@ ProcessHandler::ProcessHandler() {
 }
 
 pid_t ProcessHandler::doFork(std::string instruction) {
+
     pid_t pid = fork();
     setpgid(pid, pid); //separate Parent & Child Process into separat ProcessGroups
     if (pid < 0) {
-        throw std::cerr << "Failed of Fork" << std::endl;
+        std::cerr << "Failed of Fork" << std::endl;
         exit(0);
-    }        
-    //If Parent
+    }
+        //If Parent
     else if (pid > 0) {
         Process* newy = new Process(pid, instruction);
         m_processes.insert(std::pair<pid_t, Process*>(pid, newy));
