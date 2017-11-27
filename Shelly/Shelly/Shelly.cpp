@@ -47,15 +47,17 @@ void Shelly::prepare() {
 
 bool Shelly::execute() {
     int status = 0;
-    int pid;
+    pid_t pid;
     prepare();
     
     if (iTyp != intyp::ext && iTyp != intyp::logout ){
     std::string instruction = xcute[0];
     //pid = pHandler->doFork(instruction);
     pid = fork();
+    if (pid != 0){
     Process* newy = new Process(pid, instruction);
     pHandler->addProcess(newy);
+    }
     }
 
     //CHILD
