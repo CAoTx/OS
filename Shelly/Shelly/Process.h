@@ -7,22 +7,21 @@
 #include <string>
 #include <map>
 
-class Process
-{
 
-    struct Event
-    {
+
+class Process {
+
+    struct Event {
         std::string message;
         time_t time;
     };
 
 public:
 
-    enum ProcessStatus
-    {
+    enum ProcessStatus {
         sick = -2, zombi = -1, workFront = 1, halted = 2, stopped = 3, endet = 4, workBack = 11
     };
-    Process(pid_t myId, std::string instruction);
+    Process(pid_t myId, std::string instruction, bool front);
     void addEvent(std::string text);
     std::string getStringStatus(ProcessStatus stat);
     ProcessStatus getStatus();
@@ -31,7 +30,14 @@ public:
     // Process(const Process& orig);
     virtual ~Process();
 
-private:
+//    friend std::ostream& operator<<(std::ostream& os, const Process& obj) {
+//        if (this->getStatus() == Process::ProcessStatus::endet)
+//        os << "pid: " << this->getPid() << " - status: endet" << std::endl;
+//        return os;
+//    }
+
+
+protected:
     pid_t pid;
     ProcessStatus status;
     int eventCtr;

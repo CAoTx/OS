@@ -1,6 +1,7 @@
 #include "Process.h"
+#include "Shelly.h"
 
-Process::Process(pid_t myID, std::string instruction)
+Process::Process(pid_t myID, std::string instruction, bool front)
 {
 
     start = time_t(NULL);
@@ -9,7 +10,10 @@ Process::Process(pid_t myID, std::string instruction)
         status = ProcessStatus::sick;
         throw "Failure in Process(): StartTime = ";
     }
+    if (front == true)
     status = ProcessStatus::workFront;
+    else if (front == false)
+        status = ProcessStatus::workBack;
     pid = myID;
 
     Event eventStart{("Start of this Process, " + getStringStatus(status)) +","+instruction, time(nullptr)};

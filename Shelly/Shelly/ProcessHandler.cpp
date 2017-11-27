@@ -1,9 +1,10 @@
 #include "ProcessHandler.h"
+#include "Shelly.h"
 
 ProcessHandler::ProcessHandler() {
 }
 
-pid_t ProcessHandler::doFork(std::string instruction) {
+pid_t ProcessHandler::doFork(std::string instruction, bool front ) {
 
     pid_t pid = fork();
     setpgid(pid, pid); //separate Parent & Child Process into separat ProcessGroups   
@@ -11,10 +12,9 @@ pid_t ProcessHandler::doFork(std::string instruction) {
     if (pid < 0) {
         std::cerr << "Failed of Fork" << std::endl;
         exit(0);
-    }
-        //If Parent
+    }//If Parent
     else if (pid > 0) {
-        Process* newy = new Process(pid, instruction);
+        Process* newy = new Process(pid, instruction,  front);
         m_processes.insert(std::pair<pid_t, Process*>(pid, newy));
     }
     return pid;
@@ -44,44 +44,65 @@ bool ProcessHandler::closeAble() {
 }
 
 Process* ProcessHandler::getLastFrontProcess() {
-    for (int i = m_processes.size(); i > 0; i++) {
-        if (m_processes.at(i)->getStatus() == Process::ProcessStatus::workFront)
-            return m_processes.at(i);
+    if (m_processes.size() > 0) {
+        for (int i = m_processes.size()-1; i > 0; i--) {
+            if (m_processes.at(i)->getStatus() == Process::ProcessStatus::workFront)
+                return m_processes.at(i);
+        }
     }
     return nullptr;
 }
 
 Process* ProcessHandler::getLastBackProcess() {
-    for (int i = m_processes.size(); i > 0; i++) {
-        if (m_processes.at(i)->getStatus() == Process::ProcessStatus::workBack)
-            return m_processes.at(i);
+    if (m_processes.size() > 0) {
+        for (int i = m_processes.size()-1; i > 0; i--) {
+            if (m_processes.at(i)->getStatus() == Process::ProcessStatus::workBack)
+                return m_processes.at(i);
+        }
     }
     return nullptr;
 }
 
 Process* ProcessHandler::getLastHaltedProcess() {
-    for (int i = m_processes.size(); i > 0; i++) {
-        if (m_processes.at(i)->getStatus() == Process::ProcessStatus::halted)
-            return m_processes.at(i);
+    if (m_processes.size() > 0) {
+        for (int i = m_processes.size()-1; i > 0; i--) {
+            if (m_processes.at(i)->getStatus() == Process::ProcessStatus::halted)
+                return m_processes.at(i);
+        }
     }
     return nullptr;
 }
 
 Process* ProcessHandler::getLastStoppedProcess() {
-    for (int i = m_processes.size(); i > 0; i++) {
-        if (m_processes.at(i)->getStatus() == Process::ProcessStatus::stopped)
-            return m_processes.at(i);
+    if (m_processes.size() > 0) {
+        for (int i = m_processes.size()-1; i > 0; i--) {
+            if (m_processes.at(i)->getStatus() == Process::ProcessStatus::stopped)
+                return m_processes.at(i);
+        }
     }
     return nullptr;
 }
 
 Process* ProcessHandler::getLastZombiProcess() {
-    for (int i = m_processes.size(); i > 0; i++) {
-        if (m_processes.at(i)->getStatus() == Process::ProcessStatus::zombi)
-            return m_processes.at(i);
+    if (m_processes.size() > 0) {
+        for (int i = m_processes.size()-1; i > 0; i--) {
+            if (m_processes.at(i)->getStatus() == Process::ProcessStatus::zombi)
+                return m_processes.at(i);
+        }
     }
     return nullptr;
 }
+
+Process* ProcessHandler::getLastEndedProcess() {
+ if (m_processes.size() > 0) {
+        for (int i = m_processes.size()-1; i > 0; i--) {
+            if (m_processes.at(i)->getStatus() == Process::ProcessStatus::endet)
+                return m_processes.at(i);
+        }
+    }
+    return nullptr;
+}
+
 
 void ProcessHandler::addProcess(Process* newProcess) {
     this->m_processes.insert(std::pair<pid_t, Process*>(newProcess->getPid(), newProcess));

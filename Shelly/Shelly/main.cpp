@@ -11,13 +11,9 @@
 
 
 #include "Shelly.h"
+#include <exception>
 
 Shelly shelly;
-
-void handle_SIGSEGV(int signum) {
-    std::cout << "SEG_FAULT:" << signum << std::endl;
-
-}
 
 void handle_keyC(int signum) {
     std::cout << "\n pressed C" << std::endl;
@@ -55,7 +51,7 @@ void handle_SIGCHLD(int signum) {
     int status;
     l_pid = waitpid(-1, &status, WNOHANG);
     if (l_pid == -1);
-    else {
+    else if (WIFEXITED(status)){
         Process* process = shelly.getPHandler()->getProcess(l_pid);
         process->changeStatus(Process::ProcessStatus::endet);               //Hier crash
         std::cout << "\nProcess " << l_pid << " terminated" << std::endl;
@@ -64,7 +60,6 @@ void handle_SIGCHLD(int signum) {
 }
 
 int main() {
-    signal(SIGSEGV, handle_SIGSEGV);
     signal(SIGINT, handle_keyC);
     signal(SIGSTOP, handle_keyZ);
     signal(SIGCHLD, handle_SIGCHLD);
@@ -72,7 +67,10 @@ int main() {
 
     try {
         while (shelly.execute());
-    } catch (...) {
+    }catch (std::exception e){
+        std::cout<<e.what()<<std::endl;
+    } 
+    catch (...) {
         std::cout << "Catch Something Mainly" << std::endl;
     }
 

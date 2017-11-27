@@ -42,8 +42,7 @@
       </toolsSet>
       <compileType>
         <ccTool>
-          <standard>8</standard>
-          <commandlineTool>clang++</commandlineTool>
+          <commandlineTool>g++</commandlineTool>
         </ccTool>
       </compileType>
       <item path="Process.cpp" ex="false" tool="1" flavor2="0">

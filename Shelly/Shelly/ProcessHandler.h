@@ -12,7 +12,7 @@ class ProcessHandler
 public:
     ProcessHandler();
 
-    pid_t doFork(std::string instruction);
+    pid_t doFork(std::string instruction, bool front);
     int timesForked();
     void addProcess(Process* newProcess);
     Process* getProcess(pid_t pid);
@@ -23,6 +23,7 @@ public:
     Process* getLastHaltedProcess();
     Process* getLastStoppedProcess();
     Process* getLastZombiProcess();
+    Process* getLastEndedProcess();
     //    Process* getProcess(int index);
 
     //ProcessHandler(const ProcessHandler& orig);
