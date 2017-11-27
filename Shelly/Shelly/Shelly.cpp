@@ -177,9 +177,7 @@ void Shelly::clean() {
 }
 
 Shelly::~Shelly() {
-    for (int i = 0; i < size; i++) {
-        delete xcute [i];
-    }
+    clean();
     delete xcute;
 }
 
