@@ -1,5 +1,4 @@
 #include "Process.h"
-#include "Shelly.h"
 
 Process::Process(pid_t myID, std::string instruction, bool front)
 {

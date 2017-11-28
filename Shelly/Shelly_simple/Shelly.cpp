@@ -1,9 +1,7 @@
-
 #include "Shelly.h"
 
 Shelly::Shelly()
 {
-    pHandler = new ProcessHandler();
     //Search for other ProcessHandler of deeper Layers make them to yours
     //maybe has to implement a synch function to keep all PHandlers Synchron 
 }
@@ -61,13 +59,8 @@ bool Shelly::execute()
     {
         std::string instruction = xcute[0];
         if (iTyp == intyp::exec_backg)
-            pid = pHandler->doFork(instruction, false);
-        else pid = pHandler->doFork(instruction, true);
-        // pid = fork();
-        //    if (pid > 0){
-        //    Process* newy = new Process(pid, instruction, true);
-        //    pHandler->addProcess(newy);
-        //    }
+            pid = doFork();
+        else pid = doFork();
     }
 
     //CHILD
@@ -87,88 +80,65 @@ bool Shelly::execute()
     else if (iTyp == intyp::exec_foreg && pid != 0)
     {
         std::cout << "\nexec_foreg" << std::endl;
-        std::cout << "Last Foreground: " << this->pHandler->getLastFrontProcess() << std::endl;
-        std::cout << "Last Background: " << this->pHandler->getLastBackProcess() << std::endl;
-        std::cout << "Last Halted: " << this->pHandler->getLastHaltedProcess() << std::endl;
-        std::cout << "Last Stopped: " << this->pHandler->getLastStoppedProcess() << std::endl;
-        std::cout << "Last Zombi: " << this->pHandler->getLastZombiProcess() << std::endl;
-        std::cout << "Last endet: " << this->pHandler->getLastEndedProcess() << std::endl;
         if (waitpid(pid, 0, WUNTRACED) > 0)
         {
-            pHandler->getLastFrontProcess()->changeStatus(Process::ProcessStatus::endet);
+            getLastProcessOf(pStatus::workFront)->status = pStatus::endet;
         }
     }
     else if (iTyp == intyp::exec_backg && pid != 0)
     {
         std::cout << "\nexec_backg" << std::endl;
-        std::cout << "Last Foreground: " << this->pHandler->getLastFrontProcess() << std::endl;
-        std::cout << "Last Background: " << this->pHandler->getLastBackProcess() << std::endl;
-        std::cout << "Last Halted: " << this->pHandler->getLastHaltedProcess() << std::endl;
-        std::cout << "Last Stopped: " << this->pHandler->getLastStoppedProcess() << std::endl;
-        std::cout << "Last Zombi: " << this->pHandler->getLastZombiProcess() << std::endl;
-        std::cout << "Last endet: " << this->pHandler->getLastEndedProcess() << std::endl;
-        pHandler->getProcess(pid)->changeStatus(Process::ProcessStatus::workBack);
+        getProcess(pid)->status = pStatus::workBack;
         //  waitpid(pid, &status, WUNTRACED | WNOHANG);
 
     }
     else if (iTyp == intyp::hc_fg && pid != 0)
     {
-        Process * process = nullptr;
+        Process* process;
         std::cout << "\nhc_fg" << std::endl;
-        std::cout << "Last Foreground: " << this->pHandler->getLastFrontProcess() << std::endl;
-        std::cout << "Last Background: " << this->pHandler->getLastBackProcess() << std::endl;
-        std::cout << "Last Halted: " << this->pHandler->getLastHaltedProcess() << std::endl;
-        std::cout << "Last Stopped: " << this->pHandler->getLastStoppedProcess() << std::endl;
-        std::cout << "Last Zombi: " << this->pHandler->getLastZombiProcess() << std::endl;
-        std::cout << "Last endet: " << this->pHandler->getLastEndedProcess() << std::endl;
-        if (xcute[1] != nullptr && *xcute[1]>-20 && *xcute[1] < 4500)
+        if (xcute[1] != nullptr && *xcute[1]>-20 && *xcute[1] < 4500)//xctue[1????????
         {
-            process = pHandler->getProcess(*xcute[1]);
+            process = getProcess(*xcute[1]);
         }
         else
         {
-            process = pHandler->getLastHaltedProcess();
+            process = getLastProcessOf(pStatus::halted);
         }
-        pid_t pid = process->getPid();
-        Process::ProcessStatus status = process->getStatus();
-        if (status == Process::ProcessStatus::halted || status == Process::ProcessStatus::stopped)
+        pid_t pid = process->pid;
+        pStatus status = process->status;
+        if (status == pStatus::halted || status == pStatus::stopped)
         {
             kill(pid, SIGCONT);
-            process->changeStatus(Process::ProcessStatus::workFront);
+            process->status = pStatus::workFront;
         }
         waitpid(pid, 0, WUNTRACED);
         return true;
     }
     else if (iTyp == intyp::hc_bg && pid != 0)
     {
+        Process* process;
         std::cout << "\nhc_bg" << std::endl;
-        std::cout << "Last Foreground: " << this->pHandler->getLastFrontProcess() << std::endl;
-        std::cout << "Last Background: " << this->pHandler->getLastBackProcess() << std::endl;
-        std::cout << "Last Halted: " << this->pHandler->getLastHaltedProcess() << std::endl;
-        std::cout << "Last Stopped: " << this->pHandler->getLastStoppedProcess() << std::endl;
-        std::cout << "Last Zombi: " << this->pHandler->getLastZombiProcess() << std::endl;
-        Process * process = nullptr;
         if (xcute[1] != nullptr && *xcute[1]>-20 && *xcute[1] < 4500)
         {
-            process = pHandler->getProcess(*xcute[1]);
+            process = getProcess(*xcute[1]);
         }
         else
         {
-            process = pHandler->getLastHaltedProcess();
+            process = getLastProcessOf(pStatus::halted);
         }
-        pid_t pid = process->getPid();
-        Process::ProcessStatus status = process->getStatus();
-        if (status == Process::ProcessStatus::halted || status == Process::ProcessStatus::stopped)
+        pid_t pid = process->pid;
+        pStatus status = process->status;
+        if (status == pStatus::halted || status == pStatus::stopped)
         {
             kill(pid, SIGCONT);
-            process->changeStatus(Process::ProcessStatus::workFront);
+            process->status = pStatus::workFront;
         }
         waitpid(pid, 0, WUNTRACED | WNOHANG);
         return true;
     }
     else if (iTyp == intyp::ext && pid != 0)
     {
-        if (pHandler->closeAble())
+        if (closeAble())
         {
             std::cout << "\nHauste" << std::endl;
             return false;
@@ -177,12 +147,10 @@ bool Shelly::execute()
         {
             std::cout << "There are still working Jobs that need to be closed" << std::endl;
         }
-
     }
     else if (iTyp == intyp::logout && pid != 0)
     {
-
-        if (pHandler->closeAble())
+        if (closeAble())
         {
             std::string in;
 
@@ -205,9 +173,57 @@ bool Shelly::execute()
     return true;
 }
 
-ProcessHandler* Shelly::getPHandler()
+std::vector<Process> Shelly::getPHandler()
 {
     return this->pHandler;
+}
+
+pid_t Shelly::doFork()
+{
+    pid_t id = fork();
+    setpgid(id, id);
+    //Parent safes processes
+    if (id < 0)
+    {
+        std::cerr << "__Fork failed__" << std::endl;
+        exit(0);
+    }
+    else if (id != 0 && iTyp == intyp::exec_foreg)
+    {
+        Process newy = {id, pStatus::workFront, xcute[0]};
+        pHandler.push_back(newy);
+    }
+    else if (id != 0 && iTyp == intyp::exec_backg)
+    {
+        Process newy = {id, pStatus::workBack, xcute[0]};
+        pHandler.push_back(newy);
+    }
+    return id;
+}
+
+Process* Shelly::getLastProcessOf(pStatus search)
+{
+    for (int i = pHandler.size(); i > 0; i--)
+    {
+        if (pHandler[i].status == search)
+            return &pHandler[i];
+    }
+    return nullptr;
+}
+
+Process* Shelly::getLastProcess()
+{
+    return &pHandler[pHandler.size() - 1];
+}
+
+bool Shelly::closeAble()
+{
+    for (int i = 0; i < pHandler.size(); i++)
+    {
+        if (pHandler[i].status != pStatus::endet || pHandler[i].status != pStatus::zombi)
+            return false;
+    }
+    return true;
 }
 
 intyp Shelly::inputType()
@@ -231,6 +247,15 @@ intyp Shelly::inputType()
             return intyp::exec_backg;
     }
     return intyp::exec_foreg;
+}
+
+Process* Shelly::getProcess(pid_t id)
+{
+    for (int i = 0; i < pHandler.size(); i++)
+    {
+        if (pHandler[i].pid == id)
+            return &(pHandler[i]);
+    }
 }
 
 void Shelly::clean()

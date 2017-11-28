@@ -1,5 +1,4 @@
 #include "ProcessHandler.h"
-#include "Shelly.h"
 
 ProcessHandler::ProcessHandler() {
 }
