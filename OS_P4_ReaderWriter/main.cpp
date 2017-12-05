@@ -33,6 +33,7 @@ void sigstop_handler(int signum) {
 int size, n_readers, n_writers;
 std::vector<int> v_buffer;
 std::map<std::thread::id, unsigned int > m_threads; //<0 = writer , >0reader
+std::vector<std::thread> v_threads;
 
 //pthread_mutex_t mxW = PTHREAD_MUTEX_INITIALIZER;
 //pthread_mutex_t mxR = PTHREAD_MUTEX_INITIALIZER;
@@ -57,9 +58,10 @@ int main(int argc, char** argv) {
         n_readers = std::stoi(argv[2]);
         n_writers = std::stoi(argv[3]);
     } else {
-        std::cout << "Größen Festlegen:\n1.BufferSize:";
+        std::cout << "Größen Festlegen:" << std::endl;
+        std::cout << "\n1.BufferSize:";
         std::cin>>size;
-        std::cout << "\n2.ReaderAmount:";
+        std::cout << "2.ReaderAmount:";
         std::cin >>n_readers;
         std::cout << "3.WriterAmount:";
         std::cin>>n_writers;
@@ -72,17 +74,22 @@ int main(int argc, char** argv) {
             //  v_buffer.push_back(rand() % n_readers);
             sem_post(&sem);
         }
-        //Create reader Threads
+
+        //Create  Threads
+        std::thread thisy;
+
         for (int i = 1; i < n_readers + 1; i++) {
-            m_threads.insert(std::pair<std::thread::id, unsigned int>(std::thread(reader_func).get_id(), i));
+            thisy = std::thread(reader_func);
+            m_threads.insert(std::pair<std::thread::id, unsigned int>(thisy.get_id(), i));
         }
-        //Create writer Threads
-        for (int i = -1; (-1 * i) < n_writers; i--) {
-            m_threads.insert(std::pair< std::thread::id, unsigned int>(std::thread(writer_func).get_id(), i));
+
+        for (int i = 100; i < n_writers + 100; i++) {
+            thisy = (std::thread(writer_func));
+            m_threads.insert(std::pair< std::thread::id, unsigned int>(thisy.get_id(), i));
         }
     } catch (std::exception ex) {
         std::cerr << "CATCHED >>" << ex.what() << std::endl;
-    }    catch (...) {
+    } catch (...) {
         std::cerr << "CATCHED SOMETHING" << std::endl;
     }
 
@@ -98,10 +105,10 @@ void reader_func() {
 
         sem_wait(&sem);
         //OUTPUT
-        std::cout << "_ReaderID:" << m_threads[tid] << " - PID:" << tid << " - Zahl:" << v_buffer[pos] << std::endl;
-        sem_wait(&sem);
+        std::cout << "_ReaderID:" << m_threads[tid]<< " - Zahl:" 
+                << v_buffer[pos] << " - PID:" <<  tid  << std::endl;
+        sem_post(&sem);
     }
-    return;
 }
 
 void writer_func() {
@@ -110,19 +117,22 @@ void writer_func() {
         int semValue;
         sem_getvalue(&sem, &semValue);
 
-        //        for (int i = semValue; i > 1; i--) {
-        //            sem_wait(&sem);
-        //        }
-        sem_wait(&sem); //Block Reader
+        while (semValue > 0) {
+            sem_trywait(&sem);
+            sem_getvalue(&sem, &semValue);
+        }
 
 
         for (int i = 0; i < size; i++) {
             v_buffer[i] = rand() % 100;
         }
         std::cout << "WRITER WROTE" << std::endl;
+
         sem_post(&sem);
+        for (int i = 0; i < n_readers; i++) {
+            sem_post(&sem);
+        }
     }
-    return;
 }
 
 
