@@ -15,13 +15,13 @@ CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux/package
 CND_PACKAGE_NAME_Debug=osp4readerwriter.tar
 CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/osp4readerwriter.tar
 # Release configuration
-CND_PLATFORM_Release=Clang-Linux
-CND_ARTIFACT_DIR_Release=dist/Release/Clang-Linux
+CND_PLATFORM_Release=GNU-Linux
+CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux
 CND_ARTIFACT_NAME_Release=os_p4_readerwriter
-CND_ARTIFACT_PATH_Release=dist/Release/Clang-Linux/os_p4_readerwriter
-CND_PACKAGE_DIR_Release=dist/Release/Clang-Linux/package
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/os_p4_readerwriter
+CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux/package
 CND_PACKAGE_NAME_Release=osp4readerwriter.tar
-CND_PACKAGE_PATH_Release=dist/Release/Clang-Linux/package/osp4readerwriter.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/osp4readerwriter.tar
 #
 # include compiler specific variables
 #

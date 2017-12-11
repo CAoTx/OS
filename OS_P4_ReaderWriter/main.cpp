@@ -38,6 +38,7 @@ int size, n_readers, n_writers;
 std::vector<int> v_buffer;
 std::vector<std::thread> v_threads;
 std::map<std::thread::id, unsigned int > m_threads; //<0 = writer , >0reader
+std::vector<sem_t*> vecci;
 
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -79,6 +80,8 @@ int main(int argc, char** argv) {
         for (int i = 0; i < size; i++) {
             v_buffer.push_back(rand() % 1000);
             sem_post(&readSem);
+            vecci.push_back(new sem_t());
+            sem_init(vecci.back(), 0, 1);
         }
 
         //Create  Threads
@@ -121,10 +124,10 @@ void reader_func() {
         sem_wait(&writeSem);
         sem_wait(&readSem);
         sem_post(&writeSem);
-
+        sem_wait(vecci.at(random));
         std::cout << "_READER:" << std::this_thread::get_id() << " - "
                 << v_buffer[random] << std::endl;
-
+        sem_post(vecci.at(random));
         sem_post(&readSem);
     }
 }
@@ -133,7 +136,7 @@ void writer_func() {
 
     while (run) {
 
-        sleep(1);
+        sleep(2);
         sem_wait(&writeSem);
 
         for (int i = 0; i < size; i++)
