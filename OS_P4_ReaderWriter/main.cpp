@@ -124,10 +124,14 @@ void reader_func() {
         sem_wait(&writeSem);
         sem_wait(&readSem);
         sem_post(&writeSem);
+        
         sem_wait(vecci.at(random));
+        
         std::cout << "_READER:" << std::this_thread::get_id() << " - "
                 << v_buffer[random] << std::endl;
+        
         sem_post(vecci.at(random));
+        
         sem_post(&readSem);
     }
 }
