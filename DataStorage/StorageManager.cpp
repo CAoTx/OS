@@ -135,11 +135,11 @@ int StorageManager::writeCacheBlock(int blockID, std::string buffer) {
         return newy.id;
     }
 
-    for (auto it : holdedBlocks) {
+    for (auto it = holdedBlocks.begin(); it != holdedBlocks.end();) {
         if ((*it).second.id == blockID) {
-            it.second.data = buffer;
-            it.second.lastused = time(0);
-            it.second.consistent = false;
+            (*it).second.data = buffer;
+            (*it).second.lastused = time(0);
+            (*it).second.consistent = false;
             return blockID;
         }
     }
