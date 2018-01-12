@@ -6,22 +6,27 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <exception>
 
 #include <sys/stat.h>
 
-struct Block {
-    int id;
-    std::string data;
-    time_t fetched = time(0);
-    time_t lastused = time(0);
+struct Block
+    {
+        int id;
+        std::string data;
+        bool consistent = true;
+        time_t fetched = time(0);
+        time_t lastused= time(0);
 
-    bool operator<(const Block& right) const {
-        return this->lastused < right.lastused;
-    }
+        bool operator<(const Block& right) const
+        {
+            return this->lastused < right.lastused;
+        }
+    };
 
-};
 
-class StorageManager {
+class StorageManager
+{
 public:
 
     StorageManager();
@@ -42,13 +47,15 @@ private:
 
     bool blockExists(const int id);
     int newBlockID();
+    bool saveLRU();
     int blockIdCtr = 0;
     int bufferSize;
     std::string homePath;
     std::ifstream readS;
     std::ofstream writeS;
     std::vector<int> totalBlocks;
-    std::map<Block, int> holdedBlocks; //bool: consistent y/n
+    std::map<int, Block> holdedBlocks; //int: lastTimeUsed
+
 
 };
 
