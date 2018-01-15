@@ -1,5 +1,4 @@
-#include <math.h>
-
+[15:56, 1/15/2018] Shezad: #include <math.h>
 #include "StorageManager.h"
 
 StorageManager::StorageManager()
@@ -103,9 +102,10 @@ int StorageManager::readCacheBlock(int blockID, std::string& buffer)
     //due to extremely complex managing of all created and still existing Blocks, 
     // there is no real searching through the harddrive required
 
-    for (auto it = holdedBlocks.begin(); it != holdedBlocks.end();)
+    
+    for (std::map<int, Block>::iterator it = holdedBlocks.begin(); it != holdedBlocks.end();it++)
     {
-        if ((*it).first == blockID)
+        if (it->first == blockID)
         {
             (*it).second.lastused = time(0);
             (*it).second.consistent = false;
@@ -197,14 +197,14 @@ int StorageManager::freeCacheBlock(int blockID)
 {
     int flag = 0;
 
-    for (auto it = holdedBlocks.begin(); it != holdedBlocks.end();)
+    for (auto it = holdedBlocks.begin(); it != holdedBlocks.end();it++)
     {
         if ((*it).second.id == blockID)
         {
             holdedBlocks.erase(it);
         }
     }
-    for (auto jt = totalBlocks.begin(); jt != totalBlocks.end();)
+    for (std::vector<int>::iterator jt = totalBlocks.begin(); jt != totalBlocks.end();jt++)
     {
         if (*jt == blockID)
         {
@@ -214,10 +214,3 @@ int StorageManager::freeCacheBlock(int blockID)
     }
     return flag;
 }
-
-
-
-
-
-
-
