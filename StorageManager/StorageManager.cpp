@@ -63,10 +63,11 @@ void StorageManager::init_store(int total_blocks, int ram_blocks) {
         int id = totalBlocks.at((total_blocks - 1) - j);
         Block newy;
         newy.id = id;
+        holdedBlocks.insert(std::pair<int, Block> (newy.lastused, newy));
         readS.open(homePath + std::to_string(id));
         readS >> newy.data;
         readS.close();
-        holdedBlocks.insert(std::pair<int, Block> (newy.lastused, newy));
+
     }
     return;
 }
@@ -181,7 +182,7 @@ int StorageManager::freeCacheBlock(int blockID) {
     std::string path = (homePath + std::to_string(blockID));
     std::remove(path.c_str());
     blockIdCtr--;
-    
+
     //-1 = error, 0 = was in holded but not in total, 1 = everythink ok
     return flag;
 }
