@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
 
     //if no overgraded parameters have been passed 
 
-
+/*
     while (!(ram < total)) {
         std::cout << "WILKOMMEN!" << std::endl;
         std::cout << "Anzahl total:";
@@ -16,12 +16,13 @@ int main(int argc, char** argv) {
         std::cout << "\nAnzahl ram:";
         std::cin >> ram;
     }
+*/
 
+    sManager.init_store(10, 5);
 
-    sManager.init_store(total, ram);
+    sManager.cleanup_store();
 
-
-
+    sManager.init_store(10, 5);
 
 
     return 0;

@@ -55,8 +55,6 @@ private:
     std::ofstream writeS;
     std::vector<int> totalBlocks;
     std::map<int, Block> holdedBlocks; //int: lastTimeUsed
-
-
 };
 
 #endif /* STORAGEMANAGER_H */
